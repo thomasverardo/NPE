@@ -1,5 +1,20 @@
 import numpy as np
 
+
+def distance(x1, x2):
+    return np.linalg.norm(x1 - x2)
+
+def mypairwise_distances(X):
+    n = X.shape[0]
+    D = np.zeros((n, n))
+    for i in range(n):
+        for j in range(i, n):
+            d = distance(X[i], X[j])
+            D[i, j] = d
+            D[j, i] = d
+    return D
+
+
 def myMDS(D, n_components):
     
     n = D.shape[0]
