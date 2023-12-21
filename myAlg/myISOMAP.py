@@ -1,5 +1,6 @@
 import numpy as np
 from sklearn.neighbors import NearestNeighbors
+from scipy.sparse.csgraph import floyd_warshall
 
 def construct_neighborhood_graph(data, n_neighbors):
     # Step 1: Construct the neighborhood graph using k-nearest neighbors
@@ -58,11 +59,11 @@ def construct_geodesic_distance_matrix(distances):
     
     for i in range(n):
         for j in range(n):
-            geodesic_matrix[i, j] = floyd_warshall(distances, i, j)
+            geodesic_matrix[i, j] = floyd_warshall_skretch(distances, i, j)
     
     return geodesic_matrix
 
-def floyd_warshall(distances, source, target):
+def floyd_warshall_skretch(distances, source, target):
     # Utility function to compute the shortest geodesic distance between two points
     n = len(distances)
     inf = np.inf
@@ -118,3 +119,35 @@ def isomap(data, n_neighbors, n_components):
     embedding = apply_mds(geodesic_matrix, n_components)
     
     return embedding
+
+
+
+def knn_graph(X, k):
+    nbrs = NearestNeighbors(n_neighbors=k, algorithm='auto').fit(X)
+    distances, indices = nbrs.kneighbors(X)
+    G = np.zeros((X.shape[0], X.shape[0]))
+    for i in range(X.shape[0]):
+        neighbors = indices[i,:]
+        for l,j in enumerate(neighbors):
+            G[i, j] = distances[i, l]
+    return G
+
+def myISOMAP(X, n_neighbors, n_components):
+    
+    G = knn_graph(X, n_neighbors)
+    
+    # D_shortest = shortest_path_distances(G) # for 1000 points it takes around 8 minutes
+    D_shortest = floyd_warshall(G, directed=False)
+    
+    n = D_shortest.shape[0]
+    H = np.eye(n) - np.ones((n, n))/n
+    B = - 0.5 * H @ D_shortest**2 @ H    # double centering matrix
+    
+    eigvals, eigvecs = np.linalg.eig(B)
+
+    sorted_indices = np.argsort(eigvals)[::-1]
+    eigvals_sqrt = np.sqrt(np.abs(eigvals[sorted_indices[:n_components]]))
+    selected_eigvecs = eigvecs[:, sorted_indices[:n_components]]
+    Y = selected_eigvecs.dot(np.diag(eigvals_sqrt))
+    
+    return Y, eigvals, eigvecs
