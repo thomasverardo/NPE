@@ -16,12 +16,11 @@ Hilbert space into which data points are mapped. This gives rise to kernel NPE. 
 
 
 To construct the weight matrix $W \in \mathbb{R}^{m \times m}$, where the $(i+1)$-th row and $(j+1)$-th column element is $W_{ij}$, the objective function to optimize is:
+$$\min \sum_{i}\Vert x_{i} - \sum_{j}W_{ij}x_{j} \Vert^{2}$$
 
-
-$$\min \sum_{i}\Vert {\bf x}_{i}-\sum_{j}W_{ij}{\bf x}_{j}\Vert^{2}$$
 with contraints $\sum_{j}W_{ij}=1,j=1,2, \ldots, m$
 
-Let $C^{(i)}$ denote an $m x m$ matrix relatex to $x_i$, called neighborhood correlation matrix, where:
+Let $C^{(i)}$ denote an $m \times m$ matrix relatex to $x_i$, called neighborhood correlation matrix, where:
 
 ![alt text](img/formula_3.png)
 
@@ -31,9 +30,11 @@ Then, let $W_i$ denotes the $(i + 1)$-th row of matrix $W$, then the solution of
 
 ### Step 3: Computing the projections
 In this step, we compute the linear projections. Solve the following generalized eigenvector problem:
-$$XMX^{T}{\bf a}=\lambda XX^{T}{\bf a}$$
+$$XMX^{T}a=\lambda XX^{T}a$$
 Where
-$$\ \ X=({\bf x}_{1}, \cdots, {\bf x}_{m}) \\ M=(I-W)^{T}(I-W) \\ I=diag(1, \cdots, 1)$$
+$$\ \ X=(x_{1}, \cdots, x_{m}) $$
+$$M=(I-W)^{T}(I-W) $$
+$$I=diag(1, \cdots, 1)$$
 There are many different method to solve the eigenvalue problem. In this implementation, we use the method of the spectral regression (SR). \
 The eigenvalue problem can be solved by two steps. \
 First step: solve the following eigenvalue problem to get the bottom non-zero eigenvectors $z_{0}, z_{1}, \cdots, z_{d-1}$:
