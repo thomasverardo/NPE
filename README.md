@@ -44,3 +44,6 @@ Second step: Find $a_i$ that satisfies
 ![alt text](img/formula_8.png)
 
 where $z_{ij}$ is the $j$-th element of $z_i$ and $\alpha >= 0$ is a regularization parameter. 
+
+## Results
+![](img/vis_minst.png)
